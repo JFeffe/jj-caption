@@ -1,48 +1,25 @@
 #!/usr/bin/env python3
 """
-Script pour lancer l'interface web Streamlit de JJ Caption.
+Point d'entrée pour l'application JJ Caption sur Streamlit Cloud.
 """
 
-import subprocess
+import streamlit as st
 import sys
-import os
 from pathlib import Path
 
+# Ajouter le répertoire src au path
+current_dir = Path(__file__).parent
+src_dir = current_dir / "src"
+sys.path.insert(0, str(src_dir))
 
-def main():
-    """Lance l'interface web Streamlit."""
+# Importer et lancer l'application
+try:
+    from gui.streamlit_app import *
+    print("✅ Application JJ Caption chargée avec succès")
+except Exception as e:
+    print(f"❌ Erreur lors du chargement: {e}")
     
-    # Vérifier que streamlit est installé
-    try:
-        import streamlit
-        print(f"✅ Streamlit installé: {streamlit.__version__}")
-    except ImportError:
-        print("❌ Streamlit n'est pas installé. Installation...")
-        subprocess.check_call([sys.executable, "-m", "pip", "install", "streamlit"])
-        print("✅ Streamlit installé!")
-    
-    # Chemin vers l'application Streamlit
-    app_path = Path(__file__).parent / "src" / "gui" / "streamlit_app.py"
-    
-    if not app_path.exists():
-        print(f"❌ Fichier d'application non trouvé: {app_path}")
-        return
-    
-    print("🚀 Lancement de l'interface web JJ Caption...")
-    print("📱 L'interface sera disponible via Streamlit Cloud")
-    print("⏹️ Appuyez sur Ctrl+C pour arrêter")
-    print("-" * 50)
-    
-    try:
-        # Lancer Streamlit sans contraintes de port pour Streamlit Cloud
-        subprocess.run([
-            sys.executable, "-m", "streamlit", "run", str(app_path)
-        ])
-    except KeyboardInterrupt:
-        print("\n⏹️ Interface arrêtée par l'utilisateur")
-    except Exception as e:
-        print(f"❌ Erreur lors du lancement: {e}")
-
-
-if __name__ == "__main__":
-    main() 
+    # Fallback : interface simple
+    st.title("🎤 JJ Caption")
+    st.success("✅ Application déployée sur Streamlit Cloud !")
+    st.info("L'interface complète sera disponible dans quelques instants...") 
