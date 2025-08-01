@@ -35,15 +35,20 @@ class WhisperHandler:
         try:
             logger.info(f"Chargement du modèle Whisper: {self.model_name}")
             
-            # Forcer l'utilisation du CPU pour éviter les problèmes de compatibilité
-            import torch
-            if torch.cuda.is_available():
-                logger.info("CUDA disponible mais utilisation forcée du CPU pour la compatibilité")
+            # Gérer l'absence de PyTorch sur Streamlit Cloud
+            try:
+                import torch
+                if torch.cuda.is_available():
+                    logger.info("CUDA disponible mais utilisation forcée du CPU pour la compatibilité")
+                device = "cpu"
+            except ImportError:
+                logger.info("PyTorch non disponible, utilisation du CPU par défaut")
+                device = "cpu"
             
             # Charger le modèle avec des options spécifiques pour éviter les erreurs
             self.model = whisper.load_model(
                 self.model_name, 
-                device="cpu",
+                device=device,
                 download_root=None,
                 in_memory=False
             )
