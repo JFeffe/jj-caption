@@ -1,109 +1,122 @@
 #!/usr/bin/env python3
 """
-Interface web Streamlit pour JJ Caption - Version ultra-simple
+Interface web Streamlit pour JJ Caption - Version stable
 """
 
 import streamlit as st
 
-# Configuration de la page
-st.set_page_config(
-    page_title="JJ Caption",
-    page_icon="🎤",
-    layout="wide"
-)
+# Configuration de la page avec cache
+@st.cache_resource
+def configure_page():
+    st.set_page_config(
+        page_title="JJ Caption",
+        page_icon="🎤",
+        layout="wide"
+    )
+
+# Initialisation sécurisée
+try:
+    configure_page()
+except Exception as e:
+    st.error(f"Erreur de configuration: {e}")
 
 # Titre principal
-st.title("🎤 JJ Caption")
-st.markdown("### Transcription Audio/Vidéo Professionnelle")
+try:
+    st.title("🎤 JJ Caption")
+    st.markdown("### Transcription Audio/Vidéo Professionnelle")
+    st.success("✅ **Application déployée avec succès sur Streamlit Cloud !**")
+except Exception as e:
+    st.error(f"Erreur d'affichage: {e}")
 
-# Message de statut
-st.success("✅ **Application déployée avec succès sur Streamlit Cloud !**")
-
-# Sidebar
-with st.sidebar:
-    st.header("⚙️ Configuration")
-    
-    # Options simples
-    model = st.selectbox(
-        "Modèle Whisper",
-        ["tiny", "base", "small", "medium"],
-        index=2
-    )
-    
-    language = st.selectbox(
-        "Langue",
-        ["Auto-détection", "Français", "Anglais", "Espagnol"]
-    )
-    
-    # Options avancées
-    with st.expander("🔧 Options avancées"):
-        st.checkbox("Post-traitement", value=True)
-        st.checkbox("Utiliser le contexte", value=True)
-        st.slider("Température", 0.0, 1.0, 0.0)
+# Sidebar avec gestion d'erreur
+try:
+    with st.sidebar:
+        st.header("⚙️ Configuration")
+        
+        # Options simples
+        model = st.selectbox(
+            "Modèle Whisper",
+            ["tiny", "base", "small", "medium"],
+            index=2
+        )
+        
+        language = st.selectbox(
+            "Langue",
+            ["Auto-détection", "Français", "Anglais", "Espagnol"]
+        )
+        
+        # Options avancées
+        with st.expander("🔧 Options avancées"):
+            st.checkbox("Post-traitement", value=True)
+            st.checkbox("Utiliser le contexte", value=True)
+            st.slider("Température", 0.0, 1.0, 0.0)
+except Exception as e:
+    st.sidebar.error(f"Erreur sidebar: {e}")
 
 # Zone principale
-st.markdown("---")
-
-# Zone de téléchargement
-st.subheader("📁 Télécharger un fichier")
-uploaded_file = st.file_uploader(
-    "Choisissez un fichier audio ou vidéo",
-    type=['mp3', 'wav', 'mp4', 'avi', 'mov', 'mkv', 'flv']
-)
-
-# Formats de sortie
-st.subheader("📤 Formats de sortie")
-col1, col2, col3 = st.columns(3)
-
-with col1:
-    srt = st.checkbox("SRT", value=True)
-    vtt = st.checkbox("VTT", value=True)
-
-with col2:
-    txt = st.checkbox("TXT (Diffusion)", value=True)
-    json = st.checkbox("JSON", value=False)
-
-with col3:
-    ass = st.checkbox("ASS", value=False)
-    scc = st.checkbox("SCC", value=False)
-
-# Traitement
-if uploaded_file is not None:
+try:
     st.markdown("---")
     
-    # Informations du fichier
-    st.subheader("📋 Informations du fichier")
-    st.write(f"**Nom :** {uploaded_file.name}")
-    st.write(f"**Type :** {uploaded_file.type}")
-    st.write(f"**Taille :** {uploaded_file.size / (1024*1024):.2f} MB")
+    # Zone de téléchargement
+    st.subheader("📁 Télécharger un fichier")
+    uploaded_file = st.file_uploader(
+        "Choisissez un fichier audio ou vidéo",
+        type=['mp3', 'wav', 'mp4', 'avi', 'mov', 'mkv', 'flv']
+    )
     
-    # Bouton de transcription
-    if st.button("🎤 Commencer la transcription", type="primary"):
-        st.info("🔄 **Mode démonstration** - Interface fonctionnelle !")
+    # Formats de sortie
+    st.subheader("📤 Formats de sortie")
+    col1, col2, col3 = st.columns(3)
+    
+    with col1:
+        srt = st.checkbox("SRT", value=True)
+        vtt = st.checkbox("VTT", value=True)
+    
+    with col2:
+        txt = st.checkbox("TXT (Diffusion)", value=True)
+        json = st.checkbox("JSON", value=False)
+    
+    with col3:
+        ass = st.checkbox("ASS", value=False)
+        scc = st.checkbox("SCC", value=False)
+    
+    # Traitement
+    if uploaded_file is not None:
+        st.markdown("---")
         
-        # Simulation
-        progress = st.progress(0)
-        status = st.empty()
+        # Informations du fichier
+        st.subheader("📋 Informations du fichier")
+        st.write(f"**Nom :** {uploaded_file.name}")
+        st.write(f"**Type :** {uploaded_file.type}")
+        st.write(f"**Taille :** {uploaded_file.size / (1024*1024):.2f} MB")
         
-        for i in range(101):
-            progress.progress(i)
-            if i < 25:
-                status.text("📥 Préparation...")
-            elif i < 50:
-                status.text("🎵 Analyse audio...")
-            elif i < 75:
-                status.text("📝 Transcription...")
-            else:
-                status.text("✅ Finalisation...")
-        
-        st.success("🎉 **Transcription terminée !** (Mode démonstration)")
-        
-        # Exemples de résultats
-        st.subheader("📄 Exemples de résultats")
-        
-        if srt:
-            with st.expander("📄 Fichier SRT (exemple)"):
-                st.code("""1
+        # Bouton de transcription
+        if st.button("🎤 Commencer la transcription", type="primary"):
+            st.info("🔄 **Mode démonstration** - Interface fonctionnelle !")
+            
+            # Simulation
+            progress = st.progress(0)
+            status = st.empty()
+            
+            for i in range(101):
+                progress.progress(i)
+                if i < 25:
+                    status.text("📥 Préparation...")
+                elif i < 50:
+                    status.text("🎵 Analyse audio...")
+                elif i < 75:
+                    status.text("📝 Transcription...")
+                else:
+                    status.text("✅ Finalisation...")
+            
+            st.success("🎉 **Transcription terminée !** (Mode démonstration)")
+            
+            # Exemples de résultats
+            st.subheader("📄 Exemples de résultats")
+            
+            if srt:
+                with st.expander("📄 Fichier SRT (exemple)"):
+                    st.code("""1
 00:00:00,000 --> 00:00:03,500
 Bonjour et bienvenue dans cette démonstration
 
@@ -115,10 +128,10 @@ de JJ Caption, votre outil de transcription
 00:00:07,200 --> 00:00:10,800
 audio et vidéo professionnel.
 """)
-        
-        if txt:
-            with st.expander("📄 Fichier TXT pour diffusion (exemple)"):
-                st.code("""'**************************************************
+            
+            if txt:
+                with st.expander("📄 Fichier TXT pour diffusion (exemple)"):
+                    st.code("""'**************************************************
 
 \\ Title: demonstration.txt
 \\ Version: 1.0
@@ -135,24 +148,28 @@ audio et vidéo professionnel.
 \\ TC:  10:00:00;00 ¶÷1426÷142D÷1470Bonjour et bienvenue§00
 \\ TC:  10:00:03;15 ¶÷1426÷142D÷1470dans cette démonstration§00
 """)
-
-else:
-    # Instructions
-    st.info("💡 **Instructions :**")
-    st.markdown("""
-    1. **Téléchargez** un fichier audio ou vidéo
-    2. **Configurez** les options dans la sidebar
-    3. **Sélectionnez** les formats de sortie
-    4. **Cliquez** sur "Commencer la transcription"
     
-    **Formats supportés :** MP3, WAV, MP4, AVI, MOV, MKV, FLV
-    """)
+    else:
+        # Instructions
+        st.info("💡 **Instructions :**")
+        st.markdown("""
+        1. **Téléchargez** un fichier audio ou vidéo
+        2. **Configurez** les options dans la sidebar
+        3. **Sélectionnez** les formats de sortie
+        4. **Cliquez** sur "Commencer la transcription"
+        
+        **Formats supportés :** MP3, WAV, MP4, AVI, MOV, MKV, FLV
+        """)
+    
+    # Footer
+    st.markdown("---")
+    st.markdown("""
+    <div style='text-align: center; color: #666;'>
+        <p>🎤 JJ Caption - Transcription Audio/Vidéo Professionnelle</p>
+        <p>Version 1.0 | Développé avec ❤️</p>
+    </div>
+    """, unsafe_allow_html=True)
 
-# Footer
-st.markdown("---")
-st.markdown("""
-<div style='text-align: center; color: #666;'>
-    <p>🎤 JJ Caption - Transcription Audio/Vidéo Professionnelle</p>
-    <p>Version 1.0 | Développé avec ❤️</p>
-</div>
-""", unsafe_allow_html=True) 
+except Exception as e:
+    st.error(f"Erreur dans l'interface principale: {e}")
+    st.info("🔄 **Rechargez la page** pour réessayer.") 
