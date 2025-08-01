@@ -29,16 +29,14 @@ def main():
         return
     
     print("🚀 Lancement de l'interface web JJ Caption...")
-    print("📱 L'interface sera disponible à l'adresse: http://localhost:8501")
+    print("📱 L'interface sera disponible via Streamlit Cloud")
     print("⏹️ Appuyez sur Ctrl+C pour arrêter")
     print("-" * 50)
     
     try:
-        # Lancer Streamlit
+        # Lancer Streamlit sans contraintes de port pour Streamlit Cloud
         subprocess.run([
-            sys.executable, "-m", "streamlit", "run", str(app_path),
-            "--server.port", "8501",
-            "--server.address", "localhost"
+            sys.executable, "-m", "streamlit", "run", str(app_path)
         ])
     except KeyboardInterrupt:
         print("\n⏹️ Interface arrêtée par l'utilisateur")
